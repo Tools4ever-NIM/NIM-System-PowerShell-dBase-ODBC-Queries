@@ -17,7 +17,7 @@ function Idm-SystemInfo {
         [string] $ConnectionParams
     )
 
-    Log info "-Connection=$Connection -TestConnection=$TestConnection -Configuration=$Configuration -ConnectionParams='$ConnectionParams'"
+    Log verbose "-Connection=$Connection -TestConnection=$TestConnection -Configuration=$Configuration -ConnectionParams='$ConnectionParams'"
     
     if ($Connection) {
         @(
@@ -284,7 +284,7 @@ function Idm-SystemInfo {
         @()
     }
 
-    Log info "Done"
+    Log verbose "Done"
 }
 
 
@@ -306,7 +306,7 @@ function Fill-SqlInfoCache {
         [string] $Query,
         [string] $Class
     )
-	Log info "-Class='$Class' -Query='$Query'"
+	Log verbose "-Class='$Class' -Query='$Query'"
 
     # Refresh cache
     $sql_command = New-dBaseCommand $Query
@@ -352,7 +352,7 @@ function Idm-Dispatcher {
         [string] $FunctionParams
     )
 
-    Log info "-Class='$Class' -Operation='$Operation' -GetMeta=$GetMeta -SystemParams='$SystemParams' -FunctionParams='$FunctionParams'"
+    Log verbose "-Class='$Class' -Operation='$Operation' -GetMeta=$GetMeta -SystemParams='$SystemParams' -FunctionParams='$FunctionParams'"
     $connection_params = ConvertFrom-Json2 $SystemParams
 
     if ($Class -eq '') {
@@ -455,7 +455,7 @@ function Idm-Dispatcher {
             Dispose-dBaseCommand $sql_command
         }
     }
-    Log info "Done"
+    Log verbose "Done"
 }
 
 #
@@ -516,10 +516,10 @@ function Open-dBaseConnection {
 
     $connection_params = ConvertFrom-Json2 $ConnectionParams
     $connection_string =  "CollatingSequence=ASCII;DBQ=$($connection_params.path);DefaultDir=$($connection_params.path);Deleted=0;Driver={Microsoft Access dBASE Driver (*.dbf, *.ndx, *.mdx)};DriverId=533;FIL=dBase 5.0;FILEDSN=$($connection_params.file_dsn);MaxBufferSize=2048;MaxScanRows=8;PageTimeout=5;SafeTransactions=0;Statistics=0;Threads=3;UID=admin111;UserCommitSync=Yes;"
-    Log info $connection_string
+    Log verbose $connection_string
 
     if ($Global:dBaseConnection -and $connection_string -ne $Global:dBaseConnectionString) {
-        Log info "dBaseConnection connection parameters changed"
+        Log verbose "dBaseConnection connection parameters changed"
         Close-dBaseConnection
     }
 
@@ -532,7 +532,7 @@ function Open-dBaseConnection {
         Log debug "Reusing dBaseConnection"
     }
     else {
-        Log info "Opening dBaseConnection '$connection_string'"
+        Log verbose "Opening dBaseConnection '$connection_string'"
 
         try {
             $connection = (new-object System.Data.Odbc.OdbcConnection);
@@ -549,7 +549,7 @@ function Open-dBaseConnection {
             #Write-Error $_
         }
 
-        Log info "Done"
+        Log verbose "Done"
     }
 }
 
@@ -557,7 +557,7 @@ function Get-SqlCommand-SelectColumnsInfo {
     param (
         [string] $Table
     )
-    Log info "Get Columns [$($Table)]"
+    Log verbose "Get Columns [$($Table)]"
     $Command = "SELECT TOP 1 * FROM $($Table)"
     log debug $Command
     $sql_command = New-Object System.Data.Odbc.OdbcCommand($Command, $Global:dBaseConnection)
@@ -567,7 +567,7 @@ function Get-SqlCommand-SelectColumnsInfo {
 
 function Close-dBaseConnection {
     if ($Global:dBaseConnection) {
-        Log info "Closing dBaseConnection"
+        Log verbose "Closing dBaseConnection"
 
         try {
             $Global:dBaseConnection.Close()
@@ -577,6 +577,6 @@ function Close-dBaseConnection {
             # Purposely ignoring errors
         }
 
-        Log info "Done"
+        Log verbose "Done"
     }
 }
